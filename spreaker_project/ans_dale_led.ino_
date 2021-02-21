@@ -1,0 +1,48 @@
+int SER_Pin = 8;   //pin 14 sur le 75HC595
+int RCLK_Pin = 9;  //pin 12 sur le 75HC595
+int SRCLK_Pin = 10; //pin 11 sur le 75HC595
+//Combien combinez-vous de 74HC595 ? Ne pas toucher si 1 seul
+#define number_of_74hc595s 1
+//Ne pas toucher
+#define numOfRegisterPins number_of_74hc595s * 8
+bool registers[numOfRegisterPins];
+void setup(){
+pinMode(SER_Pin, OUTPUT);
+pinMode(RCLK_Pin, OUTPUT);
+pinMode(SRCLK_Pin, OUTPUT);
+//Reset tous les pins du 74HC595
+clearRegisters();
+writeRegisters();
+}
+//Place tous les pins du 74HC595 à l'état "OFF"
+void clearRegisters(){
+for(int i = numOfRegisterPins - 1; i >=  0; i--){
+registers[i] = LOW;
+}
+}
+//Enregistrer et afficher les valeurs dans le registre
+//Executer uniquement APRES que toutes les valeurs aient été programmées
+void writeRegisters(){
+digitalWrite(RCLK_Pin, LOW);
+for(int i = numOfRegisterPins - 1; i >=  0; i--){
+digitalWrite(SRCLK_Pin, LOW);
+int val = registers[i];
+digitalWrite(SER_Pin, val);
+digitalWrite(SRCLK_Pin, HIGH);
+}
+digitalWrite(RCLK_Pin, HIGH);
+}
+//Place un pin du 74HC595 à l'état HAUT ou BAS
+void setRegisterPin(int index, int value){
+registers[index] = value;
+}
+
+void loop(){
+setRegisterPin(2, HIGH);
+setRegisterPin(3, HIGH);
+setRegisterPin(4, LOW);
+setRegisterPin(5, HIGH);
+setRegisterPin(7, HIGH);
+writeRegisters();  //Doit être exécuté pour appliquer les changements
+//Executer seulement une fois que toutes les valeurs ont été enregistrées comme vous le souhaitiez.
+}
